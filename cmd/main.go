@@ -7,8 +7,8 @@ import (
 
 	"github.com/mostafaBachir/task-service/config"
 	"github.com/mostafaBachir/task-service/database"
-	// ajoute ceci aussi si pas encore fait
-	"github.com/mostafaBachir/task-service/models"
+	"github.com/mostafaBachir/task-service/routes"
+
 )
 
 func main() {
@@ -18,15 +18,13 @@ func main() {
 		log.Fatal("❌ Erreur de chargement de la configuration :", err)
 	}
 
-	// 2. Connexion à la base de données
-	database.ConnectDatabase(cfg.DatabaseURL)
-	
-	err = database.DB.AutoMigrate(&models.Project{})
-	if err != nil {
-		log.Fatal("❌ Migration Project échouée :", err)
-	}
+	// 2. Initialiser la base de données
+	database.InitDatabase(cfg)
+
 	// 3. Créer l'application Fiber
 	app := fiber.New()
+
+	routes.SetupRoutes(app)
 
 	// 4. Route simple pour tester
 	app.Get("/ping", func(c *fiber.Ctx) error {
